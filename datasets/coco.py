@@ -115,8 +115,7 @@ class ConvertCocoPolysToMask(object):
 def make_coco_transforms(image_set):
 
     normalize = T.Compose([
-        T.ToTensor(),
-        T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        T.ToTensor()
     ])
 
     scales = [480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800]
@@ -147,10 +146,10 @@ def make_coco_transforms(image_set):
 def build(image_set, args):
     root = Path(args.coco_path)
     assert root.exists(), f'provided COCO path {root} does not exist'
-    mode = 'instances'
+    mode = 'custom'
     PATHS = {
-        "train": (root / "train2017", root / "annotations" / f'{mode}_train2017.json'),
-        "val": (root / "val2017", root / "annotations" / f'{mode}_val2017.json'),
+        "train": (root / "train2021", root / "annotations" / f'{mode}_train.json'),
+        "val": (root / "val2021", root / "annotations" / f'{mode}_val.json'),
     }
 
     img_folder, ann_file = PATHS[image_set]
