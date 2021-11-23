@@ -1,7 +1,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 """
 DETR Transformer class.
-
 Copy-paste from torch.nn.Transformer with modifications:
     * positional encodings are passed in MHattention
     * extra LN at the end of encoder is removed
@@ -13,6 +12,7 @@ from typing import Optional, List
 import torch
 import torch.nn.functional as F
 from torch import nn, Tensor
+from models.gated_axial_attention import AxialBlock_dynamic
 
 
 class Transformer(nn.Module):
@@ -129,7 +129,8 @@ class TransformerEncoderLayer(nn.Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                  activation="relu", normalize_before=False):
         super().__init__()
-        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        # self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        self.self_attn = AxialBlock_dynamic(d_model, d_model)  # maybe group should be init to nhead
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)
@@ -185,8 +186,10 @@ class TransformerDecoderLayer(nn.Module):
     def __init__(self, d_model, nhead, dim_feedforward=2048, dropout=0.1,
                  activation="relu", normalize_before=False):
         super().__init__()
-        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
-        self.multihead_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        # self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        # self.multihead_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)
+        self.self_attn = AxialBlock_dynamic(d_model, d_model)  # maybe group should be init to nhead
+        self.multihead_attn = AxialBlock_dynamic(d_model, d_model)  # maybe group should be init to nhead
         # Implementation of Feedforward model
         self.linear1 = nn.Linear(d_model, dim_feedforward)
         self.dropout = nn.Dropout(dropout)
